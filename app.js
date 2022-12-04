@@ -33,7 +33,9 @@ app.use(`${api}`, userRoutes);
 app.use(`${api}`, interestRoutes);
 app.use(`${api}`, eventsRoutes);
 app.use(`${api}`, interactRoutes);
-
+app.get('/', (req, res) => {
+    res.send(`Server is running`)
+});
 io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('getRoomChats', async (msg) => {
