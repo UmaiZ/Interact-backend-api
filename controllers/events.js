@@ -33,7 +33,7 @@ const createEvent = async (req, res) => {
     if (!file) return res.status(400).send('No image in the request');
     const eventImage = file.filename;
 
-    const basePath = `https://${req.get('host')}/public/uploads/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
 
     const saveEvent = Events({
         eventName: req.body.eventName,

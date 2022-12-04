@@ -214,7 +214,10 @@ const updateImage = async (req, res) => {
     if (!file) return res.status(400).send('No image in the request');
     const userImage = file.filename;
 
-    const basePath = `https://${req.get('host')}/public/uploads/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+
+
+
 
     try {
         const updateUser = await Users.findByIdAndUpdate(req.user.user_id, {
@@ -242,7 +245,7 @@ const createalbum = async (req, res) => {
     if (!file) return res.status(400).send('No image in the request');
     const userImage = file.filename;
 
-    const basePath = `https://${req.get('host')}/public/uploads/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
 
     try {
         const album = Albums({
@@ -280,7 +283,7 @@ const pushalbum = async (req, res) => {
     const file = req.file;
     if (!file) return res.status(400).send('No image in the request');
     const userImage = file.filename;
-    const basePath = `https://${req.get('host')}/public/uploads/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
 
     try {
 
@@ -322,7 +325,7 @@ const editalbum = async (req, res) => {
     const file = req.file;
     if (!file) return res.status(400).send('No image in the request');
     const albumImage = file.filename;
-    const basePath = `https://${req.get('host')}/public/uploads/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
 
     try {
 
@@ -487,7 +490,7 @@ const updatePartnerImage = async (req, res) => {
     const file = req.file;
     if (!file) return res.status(400).send('No image in the request');
     const albumImage = file.filename;
-    const basePath = `https://${req.get('host')}/public/uploads/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
 
 
     try {
