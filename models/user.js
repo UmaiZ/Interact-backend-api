@@ -84,7 +84,12 @@ const userschema = new mongoose.Schema({
         default: true
 
     },
-
+    userChatRooms: [
+        // {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: 'albums'
+        // }
+    ],
     partnerProfile: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'partners'

@@ -109,11 +109,55 @@ const likePartner = async (req, res) => {
             // console.log(exists);
 
             if (exists.length > 0) {
+
+
                 const createRoom = Rooms({
                     partner1: req.user.partner_id,
                     partner2: req.params.id
                 })
                 const creating = await createRoom.save()
+
+                const user1 = await Users.findOne({ partnerProfile: req.user.partner_id }).populate(['partnerProfile', {
+                    'path': 'partnerProfile',
+                    'populate': 'partners'
+                }]);
+                const user2 = await Users.findOne({ partnerProfile: req.params.id }).populate(['partnerProfile', {
+                    'path': 'partnerProfile',
+                    'populate': 'partners'
+                }]);
+                // console.log(user1)
+                // console.log(user2)
+
+
+                const updateuser = await Users.findByIdAndUpdate(user1.partnerProfile.partners[0]._id, {
+                    $push: {
+                        userChatRooms: creating._id
+                    }
+                }, {
+                    new: true
+                }).exec();
+                const updateuser1 = await Users.findByIdAndUpdate(user1.partnerProfile.partners[1]._id, {
+                    $push: {
+                        userChatRooms: creating._id
+                    }
+                }, {
+                    new: true
+                }).exec();
+
+                const updateuser2 = await Users.findByIdAndUpdate(user2.partnerProfile.partners[0]._id, {
+                    $push: {
+                        userChatRooms: creating._id
+                    }
+                }, {
+                    new: true
+                }).exec();
+                const updateuser3 = await Users.findByIdAndUpdate(user2.partnerProfile.partners[1]._id, {
+                    $push: {
+                        userChatRooms: creating._id
+                    }
+                }, {
+                    new: true
+                }).exec();
 
                 return res.status(200).json({ 'success': true, 'match': true, 'message': 'Success', data: users, 'room': creating })
             }
