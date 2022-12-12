@@ -146,6 +146,13 @@ const loginUser = async (req, res) => {
             }
         );
         user.userToken = token;
+        if (user.partnerProfile) {
+            const interest1 = user.partnerProfile.partners[0].userInterest;
+            const interest2 = user.partnerProfile.partners[1].userInterest;
+            const mergeinterest = [...interest1, ...interest2];
+            let dup = [...new Set(mergeinterest)];
+            user.partnerProfile.partnerMergeInterest = dup;
+        }
 
         return res.status(200).json({ message: "login successfully", data: user, success: true })
     }
@@ -163,6 +170,22 @@ const getUserByToken = async (req, res) => {
     if (!user) {
         return res.status(200).json({ message: "user not found", success: false })
 
+    }
+
+    const token = jwt.sign(
+        { user_id: user._id, partner_id: user.partnerProfile ? user.partnerProfile._id : "" },
+        process.env.TOKEN_KEY,
+        {
+            expiresIn: "7d",
+        }
+    );
+    user.userToken = token;
+    if (user.partnerProfile) {
+        const interest1 = user.partnerProfile.partners[0].userInterest;
+        const interest2 = user.partnerProfile.partners[1].userInterest;
+        const mergeinterest = [...interest1, ...interest2];
+        let dup = [...new Set(mergeinterest)];
+        user.partnerProfile.partnerMergeInterest = dup;
     }
 
     return res.status(200).json({ message: "success", success: true, data: user })

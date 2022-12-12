@@ -141,6 +141,9 @@ const partnerProfileSchema = new mongoose.Schema({
             ref: 'partners'
         }
     ],
+    partnerMergeInterest: [
+
+    ],
 })
 
 // userschema.virtual('id').get(function () {
