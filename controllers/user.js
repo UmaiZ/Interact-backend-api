@@ -126,7 +126,13 @@ const loginUser = async (req, res) => {
     const user = await Users.findOne({ userEmail: req.body.userEmail }).populate(['userAlbums', 'partnerProfile', {
         'path': 'partnerProfile',
         'populate': 'partners'
-    }
+    },
+
+        'userChatRooms', {
+            'path': 'userChatRooms',
+            'populate': ['users', 'partners'],
+        },
+
 
     ]);
     if (!user) {
@@ -164,7 +170,12 @@ const getUserByToken = async (req, res) => {
     const user = await Users.findById(req.user.user_id).populate(['userAlbums', 'partnerProfile', {
         'path': 'partnerProfile',
         'populate': 'partners'
-    }
+    },
+
+        'userChatRooms', {
+            'path': 'userChatRooms',
+            'populate': ['users', 'partners'],
+        },
 
     ]);
     if (!user) {
@@ -546,3 +557,6 @@ module.exports = {
     pushalbum: [uploadOptions.single('image'), pushalbum],
     editalbum: [uploadOptions.single('image'), editalbum]
 };
+
+
+

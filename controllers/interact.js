@@ -1,6 +1,8 @@
 const { Users } = require('../models/user')
 const { Partners } = require('../models/user')
 const { Rooms } = require('../models/chatroom')
+const { RoomsMerge } = require('../models/multiroomschema')
+
 var FCM = require('fcm-node');
 var serverKey = 'AAAAN7C9ewI:APA91bF7cF1e8rzvy7TtITrav-L-8ajiVMPxL4Iw5IaA-wTaznpe9YH4i-_n_llqrKoORMQaJR18xxVM3E7sHj204IJqyDvw0OrUDWGZZWcd8VTelPbcpwiJ7P82wIC4Y15p_OZsFtBe'; //put your server key here
 var fcm = new FCM(serverKey);
@@ -91,6 +93,26 @@ const getRooms = async (req, res) => {
         return res.status(400).json({ success: false, message: err })
     }
 }
+const getAllRooms = async (req, res) => {
+    try {
+        const chats = await Rooms.find().populate(['partner1', 'partner2', {
+            'path': 'partner1',
+            'populate': 'partners'
+        }, {
+                'path': 'partner2',
+                'populate': 'partners'
+            }])
+        res.status(200).json({ 'success': true, 'message': 'Success', data: chats })
+
+    } catch (err) {
+        console.log(err);
+        if (err.name === 'ValidationError') {
+            console.error(Object.values(err.errors).map(val => val.message))
+            return res.status(400).json({ success: false, message: Object.values(err.errors).map(val => val.message)[0] })
+        }
+        return res.status(400).json({ success: false, message: err })
+    }
+}
 
 
 const likePartner = async (req, res) => {
@@ -111,11 +133,7 @@ const likePartner = async (req, res) => {
             if (exists.length > 0) {
 
 
-                const createRoom = Rooms({
-                    partner1: req.user.partner_id,
-                    partner2: req.params.id
-                })
-                const creating = await createRoom.save()
+
 
                 const user1 = await Users.findOne({ partnerProfile: req.user.partner_id }).populate(['partnerProfile', {
                     'path': 'partnerProfile',
@@ -127,6 +145,11 @@ const likePartner = async (req, res) => {
                 }]);
                 // console.log(user1)
                 // console.log(user2)
+                const createRoom = RoomsMerge({
+                    partners: [req.user.partner_id, req.params.id],
+                    users: [user1.partnerProfile.partners[0]._id, user1.partnerProfile.partners[1]._id, user2.partnerProfile.partners[0]._id, user2.partnerProfile.partners[1]._id]
+                })
+                const creating = await createRoom.save()
 
 
                 const updateuser = await Users.findByIdAndUpdate(user1.partnerProfile.partners[0]._id, {
@@ -197,12 +220,43 @@ const dislikePartner = async (req, res) => {
     }
 }
 
+const getMatchInteract = async (req, res) => {
+
+    try {
+        const partnerdetails = await Partners.findById(req.user.partner_id);
+        console.log(partnerdetails.partnerLikeuser)
+        // console.log(partnerdetails._id)
+
+        console.log(req.user.partner_id)
+
+        const users = await Partners.find({ 'partnerLikeuser': { $in: [partnerdetails._id], } }).populate(['partners']);
+        const data = users.filter((e) => {
+            console.log(partnerdetails.partnerLikeuser.includes(e._id))
+            return partnerdetails.partnerLikeuser.includes(e._id)
+        });
+        console.log(data)
+
+        res.status(200).json({ 'success': true, 'message': 'Success', data: data })
+
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            console.error(Object.values(err.errors).map(val => val.message))
+            return res.status(400).json({ success: false, message: Object.values(err.errors).map(val => val.message)[0] })
+        }
+        return res.status(400).json({ success: false, message: err })
+    }
+}
+
+
+
 module.exports = {
     getInteract,
     likePartner,
     dislikePartner,
     getRooms,
-    getInteractwithInterest
+    getAllRooms,
+    getInteractwithInterest,
+    getMatchInteract
 };
 
 

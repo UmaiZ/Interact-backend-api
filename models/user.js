@@ -85,10 +85,10 @@ const userschema = new mongoose.Schema({
 
     },
     userChatRooms: [
-        // {
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     ref: 'albums'
-        // }
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'roomsmerge'
+        }
     ],
     partnerProfile: {
         type: mongoose.Schema.Types.ObjectId,
