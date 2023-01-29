@@ -36,41 +36,41 @@ app.use(`${api}`, interactRoutes);
 app.get('/', (req, res) => {
     res.send(`Server is running`)
 });
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    socket.on('getRoomChats', async (msg) => {
-        const getroomchat = await Rooms.findById(msg.roomid);
-        io.emit('messagerecieved', getroomchat.chats);
-    });
+// io.on('connection', (socket) => {
+//     console.log('a user connected');
+//     socket.on('getRoomChats', async (msg) => {
+//         const getroomchat = await Rooms.findById(msg.roomid);
+//         io.emit('messagerecieved', getroomchat.chats);
+//     });
 
-    socket.on('sendMessage', async (msg) => {
-        // console.log(msg);
-        const sendMessagetoRoom = await Rooms.findByIdAndUpdate(msg.roomid, {
-            $push: {
-                chats: {
-                    "message": msg.message,
-                    "messagetype": msg.messagetype,
-                    "lastSeen": msg.lastSeen,
-                    "partner": msg.partner,
-                }
-            }
-        }, {
-            new: true
-        }).populate(['partner1', 'partner2', {
-            'path': 'partner1',
-            'populate': 'partners'
-        }, {
-                'path': 'partner2',
-                'populate': 'partners'
-            },
-            {
-                'path': 'chats',
-                'populate': 'partner'
-            }])
-        io.emit('messagerecieved', sendMessagetoRoom);
-    });
+//     socket.on('sendMessage', async (msg) => {
+//         // console.log(msg);
+//         const sendMessagetoRoom = await Rooms.findByIdAndUpdate(msg.roomid, {
+//             $push: {
+//                 chats: {
+//                     "message": msg.message,
+//                     "messagetype": msg.messagetype,
+//                     "lastSeen": msg.lastSeen,
+//                     "partner": msg.partner,
+//                 }
+//             }
+//         }, {
+//             new: true
+//         }).populate(['partner1', 'partner2', {
+//             'path': 'partner1',
+//             'populate': 'partners'
+//         }, {
+//                 'path': 'partner2',
+//                 'populate': 'partners'
+//             },
+//             {
+//                 'path': 'chats',
+//                 'populate': 'partner'
+//             }])
+//         io.emit('messagerecieved', sendMessagetoRoom);
+//     });
 
-});
+// });
 
 mongoose.connect(process.env.COLLECTION, {
     dbName: 'interact-dev'
@@ -85,8 +85,8 @@ mongoose.connect(process.env.COLLECTION, {
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-    console.log(`App listening on port ${PORT}!`);
-});
+// server.listen(PORT, () => {
+//     console.log(`App listening on port ${PORT}!`);
+// });
 
-// app.listen(PORT, () => { console.log(`App listening on port ${PORT}!`); });
+app.listen(PORT, () => { console.log(`App listening on port ${PORT}!`); });
